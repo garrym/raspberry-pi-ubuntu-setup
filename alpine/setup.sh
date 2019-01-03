@@ -1,17 +1,20 @@
 
-# Edit /etc/apk/repositories to enable the community and test repositories
-sed 's/#http:\/\/mirror.clarkson.edu\/alpine\/v3\.8\/community/http:\/\/mirror.clarkson.edu\/alpine\/v3\.8\/community/' /etc/apk/repositories
-sed 's/#http:\/\/mirror.clarkson.edu\/alpine\/edge\/testing/http:\/\/mirror.clarkson.edu\/alpine\/edge\/testing/' /etc/apk/repositories
+echo -e "http://dl-cdn.alpinelinux.org/alpine/v3.8/main\nhttp://dl-cdn.alpinelinux.org/alpine/v3.8/community\nhttp://dl-cdn.alpinelinux.org/alpine/edge/testing" > /etc/apk/repositories
 
 apk update
 apk upgrade
-lbu_commit
 
 apk add sudo
-apk add ufw
 apk add curl
 
-# Install docker
+apk add ufw
+ufw default deny incoming
+ufw allow ssh
+ufw enable
+
 apk add docker
 rc-update add docker boot
+
+lbu_commit
+
 service docker start
