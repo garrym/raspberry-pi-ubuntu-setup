@@ -46,6 +46,9 @@ lbu_commit
 # PasswordAuthentication yes
 # PermitRootLogin yes
 
-If you aren't too concerned with security navigate edit /etc/ssh/sshd_config and uncomment the line labeled:
-# PasswordAuthentication yes
-# Otherwise configure sshd in a secure manner
+# Save and exit, then restart sshd
+
+/etc/init.d/sshd restart
+
+# You should now be able to SSH to the Raspberry Pi via the following command:
+# ssh root@<ipaddress>
