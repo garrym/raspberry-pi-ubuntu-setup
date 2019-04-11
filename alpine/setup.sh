@@ -36,3 +36,16 @@ rc-update add sshd
 /etc/init.d/sshd start
 
 lbu_commit
+
+# Setting up SSH by enabling root login
+
+# WARNING: The following method is not recommended and will lower the security of your Raspberry Pi.
+# DO NOT DO THIS IF YOU ARE UNAWARE OF THE CONSEQUENCES OF ENABLING ROOT LOGIN VIA SSH!
+
+# Edit the /etc/ssh/sshd_config file and make sure the following two lines are uncommented and are set to 'yes'
+# PasswordAuthentication yes
+# PermitRootLogin yes
+
+If you aren't too concerned with security navigate edit /etc/ssh/sshd_config and uncomment the line labeled:
+# PasswordAuthentication yes
+# Otherwise configure sshd in a secure manner
