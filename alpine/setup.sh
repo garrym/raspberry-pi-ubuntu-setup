@@ -1,3 +1,5 @@
+read -p "Enter username of account to create: " username
+
 # Unzip and copy the Alpine files to a FAT32 formatted SD card ensuring you have chosen
 # the right architecture for the Raspberry Pi model you are using. I found the following
 # works:
@@ -16,39 +18,47 @@
 # http://<mirror>/alpine/<version>/community
 # http://<mirror>/alpine/edge/testing
 
+# Update packages to latest versions
 apk update
 apk upgrade
 
+# Add basic tools
 apk add sudo
 apk add curl
 
+# Install firewall and block everything but SSH
 apk add ufw
 ufw default deny incoming
 ufw allow ssh
 ufw enable
 
-apk add docker
-rc-update add docker boot
-service docker start
-
+# Add SSH
 apk add openssh
 rc-update add sshd
+
+# Add user, set password and enable terminal login
+apk add shadow
+addgroup -S $username
+adduser -S $username
+passwd $username
+usermod -s /bin/ash garry
+
+# (INSECURE) Allow password authentication via SSH
+sed -i -e 's/#PasswordAuthentication yes/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+echo "AllowedUsers $username" >> /etc/ssh/sshd_config
+
+# Start SSH
 /etc/init.d/sshd start
+
+echo "You should now be able to access the terminal via the following command:
+      ssh $username@<ipaddress>"
+
+# Enable login for the new user
+# Edit /etc/passwd and change /bin/nologin to /bin/ash
 
 lbu_commit
 
-# Setting up SSH by enabling root login
-
-# WARNING: The following method is not recommended and will lower the security of your Raspberry Pi.
-# DO NOT DO THIS IF YOU ARE UNAWARE OF THE CONSEQUENCES OF ENABLING ROOT LOGIN VIA SSH!
-
-# Edit the /etc/ssh/sshd_config file and make sure the following two lines are uncommented and are set to 'yes'
-# PasswordAuthentication yes
-# PermitRootLogin yes
-
-# Save and exit, then restart sshd
-
-/etc/init.d/sshd restart
-
-# You should now be able to SSH to the Raspberry Pi via the following command:
-# ssh root@<ipaddress>
+# Add Docker and set to start at boot
+apk add docker
+rc-update add docker boot
+service docker start
